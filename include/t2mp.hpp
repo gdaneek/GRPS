@@ -64,11 +64,6 @@ namespace t2mp {
             uint8_t byte_val;
             std::string vname;
             bool is_ptr;
-
-            friend std::ostream& operator<<(std::ostream& os, const MemoryByte& mb) {
-                os << mb.addr << " " << (uint16_t)mb.byte_val << " " << mb.vname << " " << mb.is_ptr;
-                return os;
-            }
         };
 
 
