@@ -224,9 +224,14 @@ namespace t2mp {
                 return;
             }
 
-            // immediate processing (rvalue) for non-pointers
+            // immediate processing (rvalue) for non-pointers integral's value
+            // for pointers now immediate disabled
 
-            if(!fsm->curr_ptr.data.rank) {
+            auto is_integral{[](const std::string& str) {
+                    try { std::stoi(str); return true; }
+                    catch (...) { return false; }}};
+
+            if(!fsm->curr_ptr.data.rank && is_integral(token)) {
                 auto rv = std::stoi(token); // get integral value
                 fsm->curr_ptr.data.value = *reinterpret_cast<decltype(fsm->curr_ptr.data.value)*>(&rv);  // append raw bits
                 fsm->update_state(std::make_shared<ExpectSemicolonState>(fsm));
