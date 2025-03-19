@@ -28,7 +28,8 @@ namespace t2mp {
      */
     class T2MP {
         // using address_t = uint32_t;
-    protected:
+    //protected:
+      public:
 
         /**
          * a unit of data that a FSM converts into a memory structure
@@ -80,7 +81,7 @@ namespace t2mp {
                 start_addr = 0x7ff000000000 + std::rand() % (long)1e6;
             }
 
-            address_t align_addr(uint8_t mod) {
+            address_t align_addr(const uint8_t mod) {
                 while(start_addr % mod)
                     this->push_back(MemoryByte{start_addr++, (uint8_t)std::rand(), "", false});
 
@@ -88,7 +89,7 @@ namespace t2mp {
             }
 
             template<typename T>
-            address_t push_bytes(std::string& name, T value, uint8_t bytes_num, bool is_ptr = false) {
+            address_t push_bytes(const std::string& name, T value, conct uint8_t bytes_num, const bool is_ptr = false) {
                 auto binded_addr {align_addr(bytes_num)};
                 for(auto i{0};i < bytes_num; ++i)   // MSB order
                     this->push_back(MemoryByte{start_addr++, (uint8_t)(value >> ((bytes_num-i-1) << 3)), name, is_ptr});
@@ -119,7 +120,7 @@ namespace t2mp {
         */
         void set_entry_state();
 
-        void update_state(std::shared_ptr<State> new_state) {
+        void update_state(const std::shared_ptr<State> new_state) {
             m_state = new_state;
         }
 
@@ -164,7 +165,7 @@ namespace t2mp {
             m_state->process(token);
         }
 
-        const MemoryPart& process(const std::vector<std::string>& tokens, bool need_reset = true) {
+        const MemoryPart& process(const std::vector<std::string>& tokens, const bool need_reset = true) {
             if(need_reset) {
                 reset();
                 m_memory.reserve(tokens.size());
