@@ -1,0 +1,55 @@
+digraph G {
+
+  nodesep=0.5;
+  ranksep=0.5;
+
+  "" -> "type"
+  "type" -> "set\ntype size"[label="type"];
+  "set\ntype size" -> "name | *"
+  "set\ntype size"[shape="rectangle"]
+  "name | *" -> "update\ntype size"[label=" *"]
+  "update\ntype size" -> "* | name"
+  "update\ntype size"[shape="rectangle"]
+  "* | name" -> "increase\nptr rank" [label=" *"]
+  "increase\nptr rank" -> "* | name"
+  "increase\nptr rank"[shape="rectangle"]
+  "* | name" -> "set name"[label=" name"]
+  "set name" -> "="
+  "set name"[shape="rectangle"]
+  "=" -> "* | & | value"[label="  ="]
+  "* | & | value" ->  "set\nderef. depth"[label=" &, *"]
+  "* | & | value" ->  "infer & set\nvalue"[label=" value"]
+
+  "set\nderef. depth" -> "value\n"[label=" &"]
+  "set\nderef. depth" -> "* | value"[label=" *"]
+
+  "set\nderef. depth"[shape="rectangle"]
+  "* | value" -> "update\nderef. depth" [label=" *"]
+  "update\nderef. depth" -> "* | value"
+  "update\nderef. depth"[shape="rectangle"]
+  "* | value" -> "infer & set\nvalue"[label="value"]
+  "value\n" -> "infer & set\nvalue"[label="value"]
+  "infer & set\nvalue" -> ";"
+  "infer & set\nvalue"[shape="rectangle"]
+
+  ";" -> "bind addr\nupdate MP"[label=" ;"]
+  "bind addr\nupdate MP" -> "type"
+  "bind addr\nupdate MP"[shape="rectangle"]
+  "name | *" -> "set name\r"[label=" name"]
+  "set name\r" -> " = "
+  "set name\r"[shape="rectangle"]
+  "value" -> "set value"[label=" value"]
+    "set value" -> ";"
+  "set value"[shape="rectangle"]
+
+  ""[shape="point", style="filled",fillcolor="dark"];
+
+  " = " ->"value"[label=" = "]
+
+  { rank=same; "update\nderef. depth" "set\nderef. depth"}
+  { rank=same; "=" " = " }
+  { rank=same; "set value" "infer & set\nvalue" "bind addr\nupdate MP"}
+  { rank=same; "set name\r" "update\ntype size" "increase\nptr rank"}
+  { rank=same; "value" "* | & | value" }
+
+}
