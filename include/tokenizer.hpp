@@ -1,3 +1,5 @@
+#pragma once
+
 #include <iostream>
 #include <vector>
 #include <string>
@@ -112,23 +114,3 @@ public:
         }
     }
 };
-
-int main() {
-    std::ifstream file("input.txt");
-    if (!file.is_open()) {
-        std::cerr << "File not found!" << std::endl;
-        return 1;
-    }
-
-    FileToTokensConverter converter;
-    std::vector<std::string> tokens;
-    converter.f(file, tokens);
-
-    std::cout << "Токены: [";
-    for (const auto& token : tokens) {
-        std::cout << "\"" << token << "\", ";
-    }
-    std::cout << "]" << std::endl;
-
-    return 0;
-}
