@@ -89,7 +89,7 @@ namespace t2mp {
             }
 
             template<typename T>
-            address_t push_bytes(const std::string& name, T value, conct uint8_t bytes_num, const bool is_ptr = false) {
+            address_t push_bytes(const std::string& name, T value, const uint8_t bytes_num, const bool is_ptr = false) {
                 auto binded_addr {align_addr(bytes_num)};
                 for(auto i{0};i < bytes_num; ++i)   // MSB order
                     this->push_back(MemoryByte{start_addr++, (uint8_t)(value >> ((bytes_num-i-1) << 3)), name, is_ptr});
