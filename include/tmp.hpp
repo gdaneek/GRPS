@@ -1,18 +1,24 @@
 #pragma once
 
-#include <cstdlib>
-#include <ctime>
+/**
+ * \file tmp.hpp
+ * group of classes and functions that implement
+ * Tokens to MemoryPart (called TMP) FSM converter
+ */
+
 #include <memory>
 #include <algorithm>
 #include <vector>
 #include <unordered_map>
-#include "t2mp_excepts.hpp"
+
+#include "tmp_excepts.hpp"
+#include "memory_part.hpp"
 
 /**
  * functions and classes of a FSM 
  * that converts a sequence of string tokens into a memory structure (memory part)
  */
-namespace t2mp {
+namespace tmp {
 
     class State {
     public:
@@ -20,17 +26,13 @@ namespace t2mp {
         virtual void process(const std::string& token) = 0;
     };
 
-    using address_t = uint32_t; //<  data type that should be considered as a memory address
-
     /**
      * implementation of a finite state machine
-     * T2MP - Tokens to Memory Part
+     * TMP - Tokens to Memory Part convert FSM
      */
-    class T2MP {
-        // using address_t = uint32_t;
-    //protected:
-      public:
+    class TMP {
 
+    protected:
         /**
          * a unit of data that a FSM converts into a memory structure
          * contains all the data specific to a pointer of any rank
@@ -57,48 +59,6 @@ namespace t2mp {
             }
         };
 
-        /**
-         * A unit for building a MemoryPart
-         */
-        struct MemoryByte {
-            address_t addr;
-            uint8_t byte_val;
-            std::string vname;
-            bool is_ptr;
-        };
-
-
-        /**
-         * a part of the memory showing how the transferred tokens are stored
-         */
-        class MemoryPart : public std::vector<MemoryByte> {
-
-            address_t start_addr;
-        public:
-
-            MemoryPart() : std::vector<MemoryByte>{} {
-                std::srand(std::time(0));
-                start_addr = 0x7ff000000000 + std::rand() % (long)1e6;
-            }
-
-            address_t align_addr(const uint8_t mod) {
-                while(start_addr % mod)
-                    this->push_back(MemoryByte{start_addr++, (uint8_t)std::rand(), "", false});
-
-                return start_addr;
-            }
-
-            template<typename T>
-            address_t push_bytes(const std::string& name, T value, const uint8_t bytes_num, const bool is_ptr = false) {
-                auto binded_addr {align_addr(bytes_num)};
-                for(auto i{0};i < bytes_num; ++i)   // MSB order
-                    this->push_back(MemoryByte{start_addr++, (uint8_t)(value >> ((bytes_num-i-1) << 3)), name, is_ptr});
-
-                return binded_addr;
-            }
-
-        };
-
     private:
 
         std::shared_ptr<State> m_state;                                         //< current state
@@ -109,10 +69,9 @@ namespace t2mp {
 
         Pointer curr_ptr;
 
-        T2MP() : m_memory{}, pointers{}, curr_ptr{} {
+        TMP() : m_memory{}, pointers{}, curr_ptr{} {
             set_entry_state();
         }
-
 
         /**
         * a function that allows the last state to find
@@ -177,7 +136,7 @@ namespace t2mp {
             return get_memory();
         }
 
-    }; // T2MP
+    }; // TMP
 
     /**
      * Concrete states represented from the final state to the initial one
@@ -188,9 +147,9 @@ namespace t2mp {
      * if successful, the memory structure is updated
      */
     class ExpectSemicolonState : public State {
-        T2MP* fsm;
+        TMP* fsm;
     public:
-        ExpectSemicolonState(T2MP* fsm_) : fsm{fsm_} {}
+        ExpectSemicolonState(TMP* fsm_) : fsm{fsm_} {}
         void process(const std::string& token) override {
             if(token != ";")
                 throw omitted_end_of_statement_error{token};
@@ -208,10 +167,10 @@ namespace t2mp {
      * setting an immediate value is allowed only for non-pointer values
      */
     class ExpectValueState : public State {
-        T2MP* fsm;
+        TMP* fsm;
         int64_t depth_of_deref {}; //< depth of dereference
     public:
-        ExpectValueState(T2MP* fsm_) : fsm{fsm_} {}
+        ExpectValueState(TMP* fsm_) : fsm{fsm_} {}
         void process(const std::string& token) override {
 
             if(token == "*") {
@@ -269,9 +228,9 @@ namespace t2mp {
      * waiting for a C-style assignment
      */
     class ExpectAssigmentState : public State {
-        T2MP* fsm;
+        TMP* fsm;
     public:
-        ExpectAssigmentState(T2MP* fsm_) : fsm{fsm_} {}
+        ExpectAssigmentState(TMP* fsm_) : fsm{fsm_} {}
         void process(const std::string& token) override {
             if(token != "=")
                 throw omitted_assignment_error{token};
@@ -287,9 +246,9 @@ namespace t2mp {
      * it is processed in this state
      */
     class ExpectNameState : public State {
-        T2MP* fsm;
+        TMP* fsm;
     public:
-        ExpectNameState(T2MP* fsm_) : fsm{fsm_} {}
+        ExpectNameState(TMP* fsm_) : fsm{fsm_} {}
         void process(const std::string& token) override {
             if(token == "*") {
                 fsm->curr_ptr.data.rank++;
@@ -306,11 +265,11 @@ namespace t2mp {
      * the types are listed in a static table `supported_types`
      */
     class ExpectTypeState : public State {
-        T2MP* fsm;
+        TMP* fsm;
         // need constexpr dict
         inline static std::unordered_map<std::string, uint8_t> supported_types = {{"int", sizeof(int)}};
     public:
-        ExpectTypeState(T2MP* fsm_) : fsm{fsm_} {}
+        ExpectTypeState(TMP* fsm_) : fsm{fsm_} {}
         void process(const std::string& token) override {
             if(!supported_types.count(token))
                 throw unsupported_type_error{token};
@@ -321,8 +280,8 @@ namespace t2mp {
     };
 
 
-    inline void T2MP::set_entry_state() {
+    inline void TMP::set_entry_state() {
         m_state = std::make_shared<ExpectTypeState>(this);
     }
 
-}; // namespace t2mp
+}; // namespace tmp

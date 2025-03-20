@@ -2,7 +2,7 @@
 
 
 
-void memoryVIZUALIZATION(std::vector<MemoryByte> memoryBYTES, sf::Font font, sf::Vector2f start, std::vector<std::vector<int>> colorVEC)
+void memoryVIZUALIZATION(MemoryPart& memoryBYTES, sf::Font font, sf::Vector2f start, std::vector<std::vector<int>> colorVEC)
 {
     sf::RenderWindow window(sf::VideoMode({800, 600}), "Memory Vizualization");
     sf::View view = window.getDefaultView();

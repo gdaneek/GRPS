@@ -7,7 +7,7 @@ BlockLine::BlockLine()
 }
 
 
-BlockLine::BlockLine(std::vector<MemoryByte> memoryBYTES, sf::Vector2f start, float scale, sf::Font font, sf::Color blockCOLOR, sf::Color topCOLOR, sf::Color centerCOLOR, sf::Color INVblockCOLOR, sf::Color INVtopCOLOR, sf::Color INVcenterCOLOR)
+BlockLine::BlockLine(MemoryPart& memoryBYTES, sf::Vector2f start, float scale, sf::Font font, sf::Color blockCOLOR, sf::Color topCOLOR, sf::Color centerCOLOR, sf::Color INVblockCOLOR, sf::Color INVtopCOLOR, sf::Color INVcenterCOLOR)
 {
     std::vector<Block> block_line{};
     for (int i = 0; i < memoryBYTES.size(); i++)
@@ -47,7 +47,7 @@ InfoLine::InfoLine()
 {}
 
 
-InfoLine::InfoLine(std::vector<MemoryByte> memoryBYTES, std::vector<Block> block_line, sf::Font font, sf::Color varCOLOR, sf::Color pointerCOLOR, sf::Color arrowCOLOR)
+InfoLine::InfoLine(MemoryPart& memoryBYTES, std::vector<Block> block_line, sf::Font font, sf::Color varCOLOR, sf::Color pointerCOLOR, sf::Color arrowCOLOR)
 {
     std::vector<Horizontal_brace> brace_line{};
     std::vector<Slip_Arrow> arrow_line{};

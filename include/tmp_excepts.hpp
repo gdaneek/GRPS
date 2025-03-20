@@ -3,7 +3,7 @@
 #include <stdexcept>
 #include <memory>
 
-namespace t2mp {
+namespace tmp {
 
     /**
     * An error caused when a FSM encounters an unsupported data type
@@ -61,4 +61,4 @@ namespace t2mp {
         undeclared_variable_error(const std::string& var)
         : std::runtime_error("The FSM has not previously encountered the variable " + var) {}
     };
-}; // namespace t2mp
+}; // namespace tmp

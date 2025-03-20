@@ -1,29 +1,33 @@
 #include "include/memory_vizual.hpp"
-#include "include/t2mp.hpp"
+#include "include/tmp.hpp"
 #include "tokenizer.hpp"
 
-using namespace t2mp;
+using namespace tmp;
 
 int main(int argc, char const *argv[]) {
 
     sf::Font font("../resources/fonts/arial.ttf");
 
-    std::ifstream file(argv[1]);
+    std::string fpath;
+
+    std::cout << "enter the name of the source code file: ";
+    std::cin >> fpath;
+
+    std::ifstream file(fpath);
     if (!file.is_open()) {
         std::cerr << "File not found!" << std::endl;
         return 1;
     }
 
-    FileToTokensConverter converter;
     std::vector<std::string> tokens;
-    converter.f(file, tokens);
 
-    T2MP t2mp;
-    auto memory = t2mp.process(tokens);
+    FileToTokensConverter converter;
+    converter.f(file, tokens);          // text to tokens
 
-    // Bad . Other variants ?
-    std::vector<MemoryByte> expected;
-    for(auto x : memory) expected.push_back(*reinterpret_cast<MemoryByte*>(&x));
-    memoryVIZUALIZATION(expected, font);
+    TMP tmp;
+    auto memory = tmp.process(tokens);  // tokens to MemoryPart
+
+    memoryVIZUALIZATION(memory, font);  // vVsualize MemoryPart
+
     return 0;
 }
